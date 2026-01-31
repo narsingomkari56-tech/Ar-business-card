@@ -2,53 +2,55 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, user-scalable=no"
+  />
 
-  <title>NFT AR – Final Working Code</title>
+  <title>NFT AR – Stable Final</title>
 
-  <!-- A-Frame -->
-  <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+  <!-- A-Frame (stable for AR.js NFT) -->
+  <script src="https://aframe.io/releases/1.0.2/aframe.min.js"></script>
 
-  <!-- AR.js NFT -->
-  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+  <!-- AR.js NFT build -->
+  <script src="https://raw.githack.com/AR-js-org/AR.js/3.4.7/aframe/build/aframe-ar-nft.js"></script>
 
   <style>
     body {
       margin: 0;
       overflow: hidden;
+      background: black;
       font-family: Arial, sans-serif;
     }
 
     #loader {
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.9);
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
       color: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 9999;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- Loading Screen -->
-  <div id="loader">Loading NFT Marker…</div>
+  <div id="loader">Loading NFT marker…</div>
 
   <a-scene
     embedded
     vr-mode-ui="enabled: false"
-    renderer="logarithmicDepthBuffer: true;"
+    renderer="antialias: true; logarithmicDepthBuffer: true;"
     arjs="
-      trackingMethod: best;
       sourceType: webcam;
+      trackingMethod: best;
       debugUIEnabled: false;
-    ">
+    "
+  >
 
     <!-- NFT MARKER -->
     <a-nft
@@ -57,19 +59,22 @@
       smooth="true"
       smoothCount="10"
       smoothTolerance="0.01"
-      smoothThreshold="5">
+      smoothThreshold="5"
+    >
 
-      <!-- 3D OBJECT -->
+      <!-- TEST OBJECT -->
       <a-box
         position="0 0 0"
-        scale="50 50 50"
-        material="color: green; opacity: 0.6"
-        animation="property: rotation;
-                   to: 0 360 0;
-                   dur: 4000;
-                   easing: linear;
-                   loop: true">
-      </a-box>
+        scale="40 40 40"
+        material="color: green; opacity: 0.7"
+        animation="
+          property: rotation;
+          to: 0 360 0;
+          dur: 4000;
+          easing: linear;
+          loop: true;
+        "
+      ></a-box>
 
     </a-nft>
 
@@ -82,19 +87,16 @@
     const loader = document.getElementById("loader");
     const scene = document.querySelector("a-scene");
 
-    // Hide loader after NFT files load
     scene.addEventListener("arjs-nft-loaded", () => {
-      console.log("✅ NFT files loaded successfully");
+      console.log("✅ NFT descriptors loaded");
       loader.style.display = "none";
     });
 
-    // Safety fallback
+    // Fallback (camera still shows)
     setTimeout(() => {
       loader.style.display = "none";
-      console.log("⚠️ Loader force hidden");
-    }, 4000);
+    }, 5000);
   </script>
 
 </body>
 </html>
-
