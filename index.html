@@ -1,52 +1,99 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-  <title>T-Rex AR</title>
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, user-scalable=no">
 
-  <!-- ✅ Updated A-Frame (1.4.0) -->
-  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-  <!-- ✅ Clean AR.js NFT script (no spaces!) -->
-  <script src="https://cdn.jsdelivr.net/npm/ar.js@3.4.0/aframe/build/aframe-ar-nft.js"></script>
+  <title>NFT AR – Final Working Code</title>
+
+  <!-- A-Frame -->
+  <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+
+  <!-- AR.js NFT -->
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
 
   <style>
-    body { margin: 0; overflow: hidden; }
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+
     #loader {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.9); color: white;
-      display: flex; justify-content: center; align-items: center;
-      font-size: 1.2em; z-index: 9999;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.9);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      font-size: 1.2rem;
     }
   </style>
 </head>
+
 <body>
-  <div id="loader">Loading T-Rex...</div>
+
+  <!-- Loading Screen -->
+  <div id="loader">Loading NFT Marker…</div>
 
   <a-scene
+    embedded
     vr-mode-ui="enabled: false"
-    arjs="sourceType: webcam; trackingMethod: best;"
-    renderer="logarithmicDepthBuffer: true"
-    embedded>
+    renderer="logarithmicDepthBuffer: true;"
+    arjs="
+      trackingMethod: best;
+      sourceType: webcam;
+      debugUIEnabled: false;
+    ">
 
-    <!-- ✅ Relative path (files in same folder) -->
-    <a-nft url="./Trex" smooth="true">
-      <a-box 
-        position="0 0 0" 
-        scale="40 40 40" 
-        color="green" 
-        opacity="0.6"
-        animation="property: rotation; to: 0 360 0; dur: 4000; easing: linear; loop: true">
+    <!-- NFT MARKER -->
+    <a-nft
+      type="nft"
+      url="./Trex"
+      smooth="true"
+      smoothCount="10"
+      smoothTolerance="0.01"
+      smoothThreshold="5">
+
+      <!-- 3D OBJECT -->
+      <a-box
+        position="0 0 0"
+        scale="50 50 50"
+        material="color: green; opacity: 0.6"
+        animation="property: rotation;
+                   to: 0 360 0;
+                   dur: 4000;
+                   easing: linear;
+                   loop: true">
       </a-box>
+
     </a-nft>
 
+    <!-- CAMERA -->
     <a-entity camera></a-entity>
+
   </a-scene>
 
   <script>
+    const loader = document.getElementById("loader");
+    const scene = document.querySelector("a-scene");
+
+    // Hide loader after NFT files load
+    scene.addEventListener("arjs-nft-loaded", () => {
+      console.log("✅ NFT files loaded successfully");
+      loader.style.display = "none";
+    });
+
+    // Safety fallback
     setTimeout(() => {
-      document.getElementById('loader').style.display = 'none';
-    }, 2500);
+      loader.style.display = "none";
+      console.log("⚠️ Loader force hidden");
+    }, 4000);
   </script>
+
 </body>
 </html>
