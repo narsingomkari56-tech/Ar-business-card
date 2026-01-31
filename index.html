@@ -1,23 +1,34 @@
-<script>
-  const scene = document.querySelector('a-scene');
-  const loader = document.getElementById('loader');
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no">
+  <title>NEON AR</title>
+  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ar.js@3.4.0/aframe/build/aframe-ar-nft.js"></script>
+  <style> body { margin: 0; overflow: hidden; } </style>
+</head>
+<body>
+  <div id="loader" style="position:absolute; top:0; left:0; width:100%; height:100%; background:black; color:white; display:flex; align-items:center; justify-content:center;">
+    Loading NEON Marker...
+  </div>
 
-  // Show debug logs
-  scene.addEventListener('loaded', () => {
-    console.log('A-Frame scene loaded');
-    // Wait a bit for AR.js to initialize NFT
-    setTimeout(() => {
-      loader.style.display = 'none';
-      console.log('Loader hidden');
-    }, 2000);
-  });
+  <a-scene 
+    vr-mode-ui="enabled: false"
+    arjs="sourceType: webcam; trackingMethod: best;"
+    renderer="logarithmicDepthBuffer: true">
 
-  // Optional: Log AR.js events
-  scene.addEventListener('arjs-nft-loaded', () => {
-    console.log('✅ NFT loaded!');
-  });
-  scene.addEventListener('arjs-nft-error', (e) => {
-    console.error('❌ NFT error:', e.detail);
-    loader.innerHTML = '<div style="color:red">NFT Error: Check console</div>';
-  });
-</script>
+    <a-nft url="NEON">  <!-- ✅ Relative path -->
+      <a-box position="0 0 0" scale="40 40 40" color="#00ffff" opacity="0.8"></a-box>
+    </a-nft>
+
+    <a-entity camera></a-entity>
+  </a-scene>
+
+  <script>
+    document.querySelector('a-scene').addEventListener('loaded', () => {
+      document.getElementById('loader').style.display = 'none';
+    });
+  </script>
+</body>
+</html>
