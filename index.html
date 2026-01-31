@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-  <title>Trex AR Fixed</title>
+  <title>Trex AR Final Fix</title>
 
-  <script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@1c2407b26c61958baa93960954dbefc8c67563c6/dist/aframe-master.min.js"></script>
+  <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+  
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
 
   <style>
@@ -21,7 +22,7 @@
 </head>
 
 <body>
-  <div id="loader">Loading Trex Marker...</div>
+  <div id="loader">Loading Trex Mark...</div>
 
   <a-scene
     vr-mode-ui="enabled: false"
@@ -56,7 +57,7 @@
 
       if (!loader || !scene) return;
 
-      // Force hide loader after 3 seconds (Fixes the "Stuck Loading" bug)
+      // Force hide loader after 3 seconds so you can see the camera
       setTimeout(() => {
         loader.style.display = 'none';
         console.log("Force hiding loader...");
