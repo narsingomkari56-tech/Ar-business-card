@@ -1,29 +1,23 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-  <title>T-Rex NFT Test</title>
-  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/ar.js@3.4.0/aframe/build/aframe-ar-nft.js"></script>
-  <style> body { margin: 0; overflow: hidden; } </style>
-</head>
-<body>
-  <a-scene
-    vr-mode-ui="enabled: false"
-    arjs="sourceType: webcam; trackingMethod: best;"
-    renderer="logarithmicDepthBuffer: true">
+<script>
+  const scene = document.querySelector('a-scene');
+  const loader = document.getElementById('loader');
 
-    <a-nft
-      type="nft"
-      url="https://arjs-cdn.s3.eu-west-3.amazonaws.com/trex/trex">
-      
-      <a-box position="0 0 0" scale="40 40 40" color="red" opacity="0.8"></a-box>
-      <a-text value="NFT WORKS!" position="0 60 0" color="white" scale="50 50 50"></a-text>
-      
-    </a-nft>
+  // Show debug logs
+  scene.addEventListener('loaded', () => {
+    console.log('A-Frame scene loaded');
+    // Wait a bit for AR.js to initialize NFT
+    setTimeout(() => {
+      loader.style.display = 'none';
+      console.log('Loader hidden');
+    }, 2000);
+  });
 
-    <a-entity camera></a-entity>
-  </a-scene>
-</body>
-</html>
+  // Optional: Log AR.js events
+  scene.addEventListener('arjs-nft-loaded', () => {
+    console.log('✅ NFT loaded!');
+  });
+  scene.addEventListener('arjs-nft-error', (e) => {
+    console.error('❌ NFT error:', e.detail);
+    loader.innerHTML = '<div style="color:red">NFT Error: Check console</div>';
+  });
+</script>
