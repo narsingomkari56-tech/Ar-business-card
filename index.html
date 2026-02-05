@@ -1,102 +1,287 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, user-scalable=no"
-  />
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    
+    <!-- A-Frame 1.0.4 for NFT stability -->
+    <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+    
+    <!-- AR.js NFT build -->
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+    
+    <style>
+      body { 
+        margin: 0; 
+        overflow: hidden; 
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #000;
+      }
+      
+      .arjs-loader {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        transition: opacity 0.8s ease-out;
+      }
+      
+      .arjs-loader.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+      
+      .loader-spinner {
+        width: 50px;
+        height: 50px;
+        border: 3px solid rgba(255,255,255,0.3);
+        border-top-color: #00d4aa;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+      }
+      
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+      
+      .status-panel {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: rgba(0, 0, 0, 0.85);
+        color: #00ff88;
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        padding: 12px;
+        border-radius: 8px;
+        z-index: 100;
+        max-width: 280px;
+        border: 1px solid #333;
+        backdrop-filter: blur(4px);
+        max-height: 200px;
+        overflow-y: auto;
+      }
+      
+      .status-panel .error { color: #ff4444; }
+      .status-panel .success { color: #00ff88; }
+      .status-panel .warning { color: #ffaa00; }
+      
+      .test-image {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 220px;
+        background: rgba(0,0,0,0.9);
+        padding: 15px;
+        border-radius: 12px;
+        color: white;
+        font-size: 12px;
+        text-align: center;
+        z-index: 90;
+        border: 2px solid #00d4aa;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      }
+      
+      .test-image img {
+        width: 100%;
+        border-radius: 4px;
+        margin-bottom: 10px;
+        border: 1px solid #333;
+      }
+      
+      .hidden { display: none !important; }
+      
+      #ar-content {
+        display: none;
+      }
+    </style>
+  </head>
 
-  <title>NFT AR – Stable Final</title>
+  <body>
+    <!-- Loading Screen -->
+    <div class="arjs-loader" id="loader">
+      <div class="loader-spinner"></div>
+      <div style="text-align: center;">
+        <strong style="font-size: 1.2em;">Initializing AR...</strong><br>
+        <span style="font-size: 0.9em; opacity: 0.8;">
+          Please allow camera access when prompted<br>
+          <span style="color: #00d4aa;">Loading NFT descriptors...</span>
+        </span>
+      </div>
+    </div>
 
-  <!-- A-Frame (stable for AR.js NFT) -->
-  <script src="https://aframe.io/releases/1.0.2/aframe.min.js"></script>
+    <!-- Debug Status Panel -->
+    <div class="status-panel" id="status">
+      <strong>🔍 AR System Status</strong><br>
+      ------------------------<br>
+      <span id="log-1">⏳ Initializing...</span>
+    </div>
 
-  <!-- AR.js NFT build -->
-  <script src="https://raw.githack.com/AR-js-org/AR.js/3.4.7/aframe/build/aframe-ar-nft.js"></script>
+    <!-- Test Target Image -->
+    <div class="test-image" id="test-image">
+      <!-- WORKING PINBALL IMAGE FROM AR.JS REPO -->
+      <img src="https://raw.githubusercontent.com/AR-js-org/AR.js/master/aframe/examples/image-tracking/nft-video/pinball.jpg" 
+           alt="Pinball Test Target" 
+           crossorigin="anonymous"
+           onerror="this.src='https://arjs-cors-proxy.herokuapp.com/https://raw.githubusercontent.com/AR-js-org/AR.js/master/aframe/examples/image-tracking/nft-video/pinball.jpg'">
+      <strong>📱 POINT CAMERA AT THIS IMAGE</strong><br>
+      <span style="font-size: 0.9em; opacity: 0.9; color: #aaa;">
+        This is the official AR.js test image
+      </span>
+    </div>
 
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-      background: black;
-      font-family: Arial, sans-serif;
-    }
-
-    #loader {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.85);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      font-size: 1.1rem;
-    }
-  </style>
-</head>
-
-<body>
-
-  <div id="loader">Loading NFT marker…</div>
-
-  <a-scene
-    embedded
-    vr-mode-ui="enabled: false"
-    renderer="antialias: true; logarithmicDepthBuffer: true;"
-    arjs="
-      sourceType: webcam;
-      trackingMethod: best;
-      debugUIEnabled: false;
-    "
-  >
-
-    <!-- NFT MARKER -->
-    <a-nft
-      type="nft"
-      url="Trex/Trex"
-      smooth="true"
-      smoothCount="10"
-      smoothTolerance="0.01"
-      smoothThreshold="5"
+    <!-- AR Scene -->
+    <a-scene
+      embedded
+      vr-mode-ui="enabled: false"
+      renderer="logarithmicDepthBuffer: true; precision: medium; antialias: true;"
+      arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix;"
     >
+      <!-- NFT MARKER - Using WORKING pinball example from AR.js repo -->
+      <a-nft
+        id="nft-marker"
+        type="nft"
+        url="https://raw.githack.com/AR-js-org/AR.js/master/aframe/examples/image-tracking/nft-video/pinball"
+        smooth="true"
+        smoothCount="15"
+        smoothTolerance="0.01"
+        smoothThreshold="10"
+        emitevents="true"
+      >
+        <!-- AR Content - Red Box that appears on image -->
+        <a-box
+          id="ar-box"
+          position="0 0 0"
+          width="150"
+          height="150"
+          depth="150"
+          material="color: #ff2d55; opacity: 0.9; metalness: 0.3; roughness: 0.4"
+          animation="property: rotation; to: 0 360 0; loop: true; dur: 4000; easing: linear"
+          visible="false"
+        ></a-box>
+        
+        <!-- Success indicator text -->
+        <a-text
+          value="SUCCESS!"
+          position="0 100 0"
+          align="center"
+          color="#00ff88"
+          scale="80 80 80"
+          visible="false"
+          id="ar-text"
+        ></a-text>
+      </a-nft>
 
-      <!-- TEST OBJECT -->
-      <a-box
-        position="0 0 0"
-        scale="40 40 40"
-        material="color: green; opacity: 0.7"
-        animation="
-          property: rotation;
-          to: 0 360 0;
-          dur: 4000;
-          easing: linear;
-          loop: true;
-        "
-      ></a-box>
+      <a-entity camera></a-entity>
+    </a-scene>
 
-    </a-nft>
+    <!-- Debug & Event Handling -->
+    <script>
+      (function() {
+        const loader = document.getElementById('loader');
+        const status = document.getElementById('status');
+        const marker = document.getElementById('nft-marker');
+        const testImagePanel = document.getElementById('test-image');
+        
+        let logCount = 1;
+        function log(msg, type = 'info') {
+          const color = type === 'error' ? '#ff4444' : type === 'success' ? '#00ff88' : type === 'warning' ? '#ffaa00' : '#aaa';
+          console.log(`[AR Test ${logCount}]`, msg);
+          
+          const newLog = document.createElement('div');
+          newLog.innerHTML = `<span style="color: ${color}">${msg}</span>`;
+          status.appendChild(newLog);
+          
+          // Keep only last 8 lines
+          while (status.children.length > 10) {
+            status.removeChild(status.children[2]);
+          }
+          
+          logCount++;
+        }
 
-    <!-- CAMERA -->
-    <a-entity camera></a-entity>
+        // Scene loaded
+        const scene = document.querySelector('a-scene');
+        scene.addEventListener('loaded', () => {
+          log('✅ A-Frame loaded', 'success');
+          setTimeout(() => {
+            loader.classList.add('hidden');
+          }, 1000);
+        });
 
-  </a-scene>
+        // NFT Events - These tell us if the descriptors loaded
+        marker.addEventListener('arjs-nft-loaded', (e) => {
+          log('✅ NFT descriptors loaded!', 'success');
+          log('Ready to track - show pinball image', 'warning');
+          
+          // Change loader text if still visible
+          const loaderText = loader.querySelector('span');
+          if (loaderText) {
+            loaderText.innerHTML = 'Point camera at the pinball image below';
+          }
+        });
 
-  <script>
-    const loader = document.getElementById("loader");
-    const scene = document.querySelector("a-scene");
+        marker.addEventListener('arjs-nft-init-error', (e) => {
+          log('❌ NFT initialization failed', 'error');
+          log('Check browser console for details', 'error');
+        });
 
-    scene.addEventListener("arjs-nft-loaded", () => {
-      console.log("✅ NFT descriptors loaded");
-      loader.style.display = "none";
-    });
+        marker.addEventListener('arjs-nft-loading-error', (e) => {
+          log('❌ Failed to load .fset/.iset files', 'error');
+          log('CORS or network issue', 'error');
+        });
 
-    // Fallback (camera still shows)
-    setTimeout(() => {
-      loader.style.display = "none";
-    }, 5000);
-  </script>
+        // Marker detection - THIS IS THE SUCCESS EVENT
+        marker.addEventListener('markerFound', (e) => {
+          log('🎯 MARKER FOUND! AR WORKS!', 'success');
+          log('Image tracking functional', 'success');
+          
+          // Show AR content
+          document.getElementById('ar-box').setAttribute('visible', true);
+          document.getElementById('ar-text').setAttribute('visible', true);
+          
+          // Dim the test image panel
+          testImagePanel.style.opacity = '0.3';
+        });
 
-</body>
+        marker.addEventListener('markerLost', () => {
+          log('👻 Marker lost (normal)', 'warning');
+          document.getElementById('ar-box').setAttribute('visible', false);
+          document.getElementById('ar-text').setAttribute('visible', false);
+          testImagePanel.style.opacity = '1';
+        });
+
+        // Camera events
+        window.addEventListener('arjs-video-loaded', () => {
+          log('📹 Camera stream active', 'success');
+        });
+
+        window.addEventListener('arjs-video-error', (e) => {
+          log('❌ Camera error - check permissions', 'error');
+        });
+
+        // Global error catching
+        window.addEventListener('error', (e) => {
+          if (e.message && e.message.includes('404')) {
+            log('❌ 404 Error - resource not found', 'error');
+          }
+        });
+
+        // Helpful timeout messages
+        setTimeout(() => {
+          if (logCount < 5) {
+            log('⏱️ Taking longer than expected...', 'warning');
+          }
+        }, 8000);
+
+      })();
+    </script>
+  </body>
 </html>
